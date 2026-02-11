@@ -21,60 +21,49 @@ class Home extends Component {
   }
 
   componentDidMount = () => {
-    // 1. Auth Check
-    if (
-      typeof Cookies.get("isLoggedIn") === "undefined" &&
-      typeof Cookies.get("jwt") === "undefined"
-    ) {
+    if (!Cookies.get("jwt")) {
       this.props.history.push("/login");
       return;
     }
-    // 2. Fetch Data
     store.dispatch(usersActionCreator(userActionTypes.AUTHORIZED));
   };
 
   render() {
-    // DEBUGGER: This will tell us if Redux has the data
-    console.log("Home Page Blogs Data:", this.props.blogs); 
+    // 1. SAFE DATA: Default to empty array if undefined
+    const blogList = this.props.blogs || [];
+    console.log("Home Page Blogs:", blogList);
 
     if (Cookies.get("isLoggedIn") === "false" && !this.props.isLoggedIn) {
       this.props.history.push("/login");
       return null;
     }
 
-    // Safety: Ensure blogs is an array
-    const blogList = Array.isArray(this.props.blogs) ? this.props.blogs : [];
-
     return (
       <div>
+        <Navbar />
+        
         {this.state.loading ? (
-          <>
-            <Navbar />
-            <div style={{ padding: "20px" }}>Loading Blogs...</div>
-          </>
+           <div style={{ padding: "20px" }}>Loading...</div>
         ) : (
-          <>
-            <Navbar />
-            <div className="body-container" style={{ padding: "20px" }}>
-              {blogList.length === 0 && <p>No blogs found. Create one!</p>}
-              
-              {blogList.map((blog, index) => {
-                // Grid Logic: Create a new Row every 4 items
-                return index % 4 === 0 ? (
-                  <Row key={index}>
-                    {blogList.slice(index, index + 4).map((b) => {
-                      return (
-                        <Col className="py-2" key={b.id || b.blogID || Math.random()}>
-                          {/* Pass the data to the card */}
-                          <BlogCard blog={b} /> 
-                        </Col>
-                      );
-                    })}
-                  </Row>
-                ) : null;
-              })}
-            </div>
-          </>
+          <div className="container" style={{ marginTop: "50px" }}>
+            
+            {/* 2. EMPTY STATE MSG */}
+            {blogList.length === 0 && (
+                <div className="alert alert-info">
+                    No blogs found. Go to "Create Blog" to add one!
+                </div>
+            )}
+
+            {/* 3. GRID SYSTEM */}
+            <Row>
+                {blogList.map((blog) => (
+                    // FIX: Use 'id' (FastAPI) instead of 'blogID'
+                    <Col md={4} sm={6} xs={12} key={blog.id || Math.random()} className="mb-4">
+                        <BlogCard blog={blog} />
+                    </Col>
+                ))}
+            </Row>
+          </div>
         )}
       </div>
     );

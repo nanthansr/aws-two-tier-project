@@ -22,6 +22,7 @@ class UpdateBlog(CreateBlog):
 
 
 class ShowBlog(BaseModel):
+    id: int
     title: str
     content: Optional[str]
     created_at: date

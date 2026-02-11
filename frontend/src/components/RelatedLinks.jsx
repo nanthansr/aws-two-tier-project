@@ -3,6 +3,12 @@ import { withRouter } from "react-router-dom";
 
 class RelatedLinks extends Component {
   render() {
+    const { blog } = this.props;
+
+  // SAFETY CHECK: If links are missing, return null (don't crash)
+  if (!blog || !blog.related_links || !Array.isArray(blog.related_links)) {
+    return null; 
+  }
     return (
       <aside className="side-bar">
         <h2>Related Links</h2>
