@@ -9,6 +9,11 @@ from sqlalchemy import pool
 # access to the values within the .ini file in use.
 config = context.config
 
+# Pull database URL from application settings (reads from .env via python-dotenv)
+# This overrides the placeholder value in alembic.ini so no credentials are hardcoded.
+from core.config import settings  # noqa: E402
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
